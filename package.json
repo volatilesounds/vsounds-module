@@ -1,0 +1,14 @@
+{
+    "name": "vsounds",
+    "version": "0.1.0",
+    "description": "A shared module designed to provide reusable audio and procedural graphics utilities for three js.",
+    "main": "src/index.js",
+    "type": "module",
+    "dependencies": {
+        "three": "^0.157.0",
+        "three-addons": "^1.2.0"
+    },
+    "files": [
+        "src"
+    ]
+}
