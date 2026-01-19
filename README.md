@@ -18,14 +18,16 @@ cd vsounds-module
 
 ### 2. Local development with simulations
 
-You can link this module to a simulation for local testing:
+When using `npm link`, the module must have its own dependencies installed locally.
+Peer dependencies (such as `three`) are not installed automatically and must be present for local development and bundlers like Vite to resolve imports correctly.
 
 ```bash
 # Inside vsounds-module
+npm install
 npm link
 
 # Inside your simulation project
-npm link vsounds-module
+npm link vsounds
 ```
 
 The simulation will now use the local version of vsounds-module. Any changes you make to the module will be immediately available in the simulation.
