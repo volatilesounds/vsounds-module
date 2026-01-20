@@ -1,9 +1,9 @@
-import { VSSceneBase } from './core/VSSceneBase';
-import { VSScenesManager } from './core/VSScenesManager';
+import { VSSimBase } from './core/VSSimBase';
+import { VSSimsManager } from './core/VSSimsManager';
 
 const VSounds = {
-    VSSceneBase,
-    VSScenesManager
+    VSSimBase,
+    VSSimsManager
 };
 
 export default VSounds;
