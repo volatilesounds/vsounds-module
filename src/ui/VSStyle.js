@@ -35,4 +35,5 @@ VSStyle.buttonBase = {
   cursor: 'pointer',
   fontFamily: VSStyle.typography.fontFamily,
   fontSize: VSStyle.typography.fontSizeSmall,
+  pointerEvents: "auto"
 }

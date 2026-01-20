@@ -17,6 +17,7 @@ export class VSButtonsOverlay {
       zIndex: 1000,
       border: "1px solid rgba(255,255,255,0.2)",
       borderRadius: "4px",
+      pointerEvents: "auto"
     });
 
     // Buttons
