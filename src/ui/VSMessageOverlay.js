@@ -9,7 +9,7 @@ export class VSMessageOverlay {
     this.messageDiv = document.createElement("div");
     Object.assign(this.messageDiv.style, {
       ...VSStyle.panelBase,
-      position: "fixed",
+      position: "absolute",
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
