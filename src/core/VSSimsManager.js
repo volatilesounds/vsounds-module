@@ -68,6 +68,12 @@ export class VSSimsManager {
   onAudioEngineInit() {
     if (this.current) {
       this.current.onAudioEngineInit?.();
+
+      // As audio engine init might be called after the simulation has been paused
+      if(this.paused)
+      {
+        this.pauseSimulationAudio();
+      }
     }
   }
 
@@ -86,15 +92,7 @@ export class VSSimsManager {
 
     this.paused = true;
 
-    // Pause simulation audio
-    // As now pausing is more like "muting" the simulation audio bus
-    if(this.audioEngine.isInitialised() && this.current.audioBus)
-    {
-      this.current.audioBus.gain.setValueAtTime(
-        0,
-        this.audioEngine.audioContext.currentTime
-      );
-    }
+    this.pauseSimulationAudio();
 
     this.current.onPause?.();
   }
@@ -107,15 +105,7 @@ export class VSSimsManager {
     this.paused = false;
     this.clock.getDelta(); // reset delta spike
 
-    // Resume simulation audio
-    // As now pausing is more like "muting" the simulation audio bus
-    if(this.audioEngine.isInitialised() && this.current.audioBus)
-    {
-      this.current.audioBus.gain.setValueAtTime(
-        1,
-        this.audioEngine.audioContext.currentTime
-      );
-    }
+    this.resumeSimulationAudio();
 
     this.current.onResume?.();
   }
@@ -147,6 +137,30 @@ export class VSSimsManager {
     if(this.paused)
     {
       this.togglePause();
+    }
+  }
+
+  pauseSimulationAudio(){
+    // Pause simulation audio
+    // As now pausing is more like "muting" the simulation audio bus
+    if(this.audioEngine.isInitialised() && this.current.audioBus)
+    {
+      this.current.audioBus.gain.setValueAtTime(
+        0,
+        this.audioEngine.audioContext.currentTime
+      );
+    }
+  }
+
+  resumeSimulationAudio(){
+    // Resume simulation audio
+    // As now pausing is more like "muting" the simulation audio bus
+    if(this.audioEngine.isInitialised() && this.current.audioBus)
+    {
+      this.current.audioBus.gain.setValueAtTime(
+        1,
+        this.audioEngine.audioContext.currentTime
+      );
     }
   }
 
