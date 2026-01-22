@@ -1,20 +1,21 @@
 import { VSStyle } from "./VSStyle";
 
 export class VSDebugOverlay {
-  constructor(parentDiv) {
+  constructor(container) {
     this.enabled = false;
     this.debugData = new Map(); // Stores categories and their debug info
 
     this.debugDiv = document.createElement("div");
     Object.assign(this.debugDiv.style, {
       ...VSStyle.panelBase,
-      top: VSStyle.spacing.edgeMedium,
-      left: VSStyle.spacing.edgeMedium,
+      position: 'absolute',
+      bottom: VSStyle.sizing.edgeMedium,
+      left: VSStyle.sizing.edgeMedium,
       whiteSpace: 'pre-line',
       display: 'none' // Initially hidden
     })
 
-    parentDiv.appendChild(this.debugDiv);
+    container.appendChild(this.debugDiv);
 
     // Listen for key press to toggle debug mode
     document.addEventListener("keydown", (event) => {

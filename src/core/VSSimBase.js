@@ -1,11 +1,21 @@
 import { VSDebugOverlay } from "../ui/VSDebugOverlay";
+import { VSGUI } from "../ui/VSGUI";
+import { VSStyle } from "../ui/VSStyle";
 
 /*
  The VSSimBase class is a base class for simulation scenes.
  It provides a common interface among different scenes so that they can be easily managed by VSSimsManager.
 */
 export class VSSimBase {
-  constructor({ scene, camera, renderer, container, audioEngine }) {
+  constructor({ scene, camera, renderer, container, audioEngine, title = "Simulation", description = "This is a simulation." }) {
+    // Enforcing final functions
+    if (this.onAudioEngineInit !== VSSimBase.prototype.onAudioEngineInit) {
+      throw new Error("onAudioEngineInit must not be overridden - override onAudioStart");
+    }
+    if (this.onAudioEngineShutdown !== VSSimBase.prototype.onAudioEngineShutdown) {
+      throw new Error("onAudioEngineShutdown must not be overridden - override onAudioStop");
+    }
+    
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
@@ -16,14 +26,19 @@ export class VSSimBase {
     this.audioBusGainPaused = 1;
 
     this.debugOverlay = new VSDebugOverlay(container); // Debug draw
+    this.gui = new VSGUI({ 
+      container, 
+      title: title,
+      style: {
+        ...VSStyle.panelBase,
+        position: 'absolute',
+        top: VSStyle.sizing.edgeMedium,
+        left: VSStyle.sizing.edgeMedium,
+      }
+    }); // GUI
 
-    // Enforcing final functions
-    if (this.onAudioEngineInit !== VSSimBase.prototype.onAudioEngineInit) {
-      throw new Error("onAudioEngineInit must not be overridden - override onAudioStart");
-    }
-    if (this.onAudioEngineShutdown !== VSSimBase.prototype.onAudioEngineShutdown) {
-      throw new Error("onAudioEngineShutdown must not be overridden - override onAudioStop");
-    }
+    // We don't show the GUI by default
+    this.showParams(false);
   }
 
   /** Called once when sim becomes active */
@@ -71,6 +86,11 @@ export class VSSimBase {
     this.onAudioStop();
   }
 
+  /* Called to show simulation params */
+  showParams(show){
+    this.gui.show(show);
+  }
+
   /** Called every frame */
   update(dt) {}
 
@@ -78,5 +98,8 @@ export class VSSimBase {
   dispose() {
     this.debugOverlay?.dispose();
     this.debugOverlay = null;
+    
+    this.gui?.destroy();
+    this.gui = null;
   }
 }

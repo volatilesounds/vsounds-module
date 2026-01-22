@@ -1,7 +1,8 @@
 import * as THREE from 'three'
-import { VSButtonsOverlay } from "../ui/VSButtonsOverlay";
+import { VSSettingsOverlay } from "../ui/VSSettingsOverlay";
 import { VSAudioEngine } from '../audio/VSAudioEngine';
 import { VSMessageOverlay } from '../ui/VSMessageOverlay';
+import { injectVSoundsStyle } from '../ui/VSStyleInject';
 
 /*
  The VSSimsManager class is a utility for managing multiple simulations. 
@@ -9,6 +10,8 @@ import { VSMessageOverlay } from '../ui/VSMessageOverlay';
 */
 export class VSSimsManager {
   constructor(renderer, camera, container) {
+    injectVSoundsStyle(); // global VSounds styles
+
     this.renderer = renderer;
     this.camera = camera;
     this.container = container;
@@ -25,13 +28,13 @@ export class VSSimsManager {
     this.audioEnabled = this.audioEngine?.isEnabled() ?? true;
 
     // Overlay
-    this.buttonsOverlay = new VSButtonsOverlay(container, {
+    this.settingsOverlay = new VSSettingsOverlay(container, {
       onToggleAudio: () => this.toggleAudio(),
       onTogglePlay: () => this.togglePause(),
       onRestart: () => this.restartSimulation()
     });
-    this.buttonsOverlay.setAudioEnabledLabel(this.audioEnabled);
-    this.buttonsOverlay.setRunningLabel(!this.paused);
+    this.settingsOverlay.setAudioEnabledLabel(this.audioEnabled);
+    this.settingsOverlay.setRunningLabel(!this.paused);
 
     this.messageOverlay = new VSMessageOverlay(container);
     this.messageOverlay.autoDispose = false; // prevent from being automatically disposed when hiding
@@ -41,12 +44,25 @@ export class VSSimsManager {
       "Audio will start automatically after a click or key press.",
       3
     );
+
+    // Add here params to be shown in settings overlay controls view
+    this.simSpeed = 1.;
+    this.settingsOverlay.gui.addParams({
+      speed: {
+        value: this.simSpeed,
+        min: 0,
+        max: 2,
+        step: 0.01,
+        label: "Time Dilation",
+        onChange: v => this.simSpeed = v
+      }
+    });
   }
 
   toggleAudio() {
     this.audioEnabled = !this.audioEnabled;
     this.audioEngine?.setEnabled(this.audioEnabled);
-    this.buttonsOverlay.setAudioEnabledLabel(this.audioEnabled);
+    this.settingsOverlay.setAudioEnabledLabel(this.audioEnabled);
   }
 
   togglePause() {
@@ -62,7 +78,7 @@ export class VSSimsManager {
       this.resumeSimulation();
     }
 
-    this.buttonsOverlay.setRunningLabel(!this.paused);
+    this.settingsOverlay.setRunningLabel(!this.paused);
   }
 
   onAudioEngineInit() {
@@ -138,6 +154,9 @@ export class VSSimsManager {
     {
       this.togglePause();
     }
+
+    // reset global param
+    this.resetGlobalParams();
   }
 
   pauseSimulationAudio(){
@@ -164,10 +183,20 @@ export class VSSimsManager {
     }
   }
 
-  update() {
-    if (!this.current) return;
+  resetGlobalParams() {
+    this.settingsOverlay.gui.reset();
+  }
 
-    const dt = this.clock.getDelta();
+  update() {
+    if (!this.current)
+    {
+      return;
+    }
+
+    let dt = this.clock.getDelta();
+
+    // Apply global simulation speed
+    dt *= this.simSpeed;
 
     if (!this.paused) {
       this.current.update(dt);

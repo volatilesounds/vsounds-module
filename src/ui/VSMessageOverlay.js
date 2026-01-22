@@ -2,8 +2,7 @@
 import { VSStyle } from "./VSStyle";
 
 export class VSMessageOverlay {
-  constructor(parentDiv) {
-    this.parentDiv = parentDiv;
+  constructor(container) {
     this.autoDispose = true; // auto dispose on hide
 
     this.messageDiv = document.createElement("div");
@@ -21,7 +20,7 @@ export class VSMessageOverlay {
       display: "none"
     });
 
-    this.parentDiv.appendChild(this.messageDiv);
+    container.appendChild(this.messageDiv);
 
     this.timeoutId = null;
   }
