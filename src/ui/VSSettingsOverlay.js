@@ -88,6 +88,5 @@ export class VSSettingsOverlay {
   #showControls() {
     const isHidden = this.guiContainer.style.display === "none";
     this.guiContainer.style.display = isHidden ? "block" : "none";
-    this.controlsBtn.style.outline = "2px";
   }
 }
