@@ -32,8 +32,8 @@ export class VSSimBase {
       style: {
         ...VSStyle.panelBase,
         position: 'absolute',
-        top: VSStyle.sizing.edgeMedium,
-        left: VSStyle.sizing.edgeMedium,
+        bottom: VSStyle.sizing.edgeMedium,
+        right: VSStyle.sizing.edgeMedium,
       }
     }); // GUI
 
