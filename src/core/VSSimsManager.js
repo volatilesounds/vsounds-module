@@ -61,7 +61,7 @@ export class VSSimsManager {
 
   toggleAudio() {
     this.audioEnabled = !this.audioEnabled;
-    this.audioEngine?.setEnabled(this.audioEnabled);
+    this.audioEngine?.setAudioEnabled(this.audioEnabled);
     this.settingsOverlay.setAudioEnabledLabel(this.audioEnabled);
   }
 
@@ -88,7 +88,7 @@ export class VSSimsManager {
       // As audio engine init might be called after the simulation has been paused
       if(this.paused)
       {
-        this.pauseSimulationAudio();
+        this.audioEngine.pauseSimulationAudio();
       }
     }
   }
@@ -108,7 +108,7 @@ export class VSSimsManager {
 
     this.paused = true;
 
-    this.pauseSimulationAudio();
+    this.audioEngine.pauseSimulationAudio();
 
     this.current.onPause?.();
   }
@@ -121,15 +121,15 @@ export class VSSimsManager {
     this.paused = false;
     this.clock.getDelta(); // reset delta spike
 
-    this.resumeSimulationAudio();
+    this.audioEngine.resumeSimulationAudio();
 
     this.current.onResume?.();
   }
 
-  setSimulation(SimClass) {
+  async setSimulation(SimClass) {
     if (this.current) {
+      await this.current.onAudioEngineShutdown();
       this.current.onExit();
-      this.current.onAudioEngineShutdown();
       this.current.dispose?.();
       this._clearSim();
     }
@@ -157,30 +157,6 @@ export class VSSimsManager {
 
     // reset global param
     this.resetGlobalParams();
-  }
-
-  pauseSimulationAudio(){
-    // Pause simulation audio
-    // As now pausing is more like "muting" the simulation audio bus
-    if(this.audioEngine.isInitialised() && this.current.audioBus)
-    {
-      this.current.audioBus.gain.setValueAtTime(
-        0,
-        this.audioEngine.audioContext.currentTime
-      );
-    }
-  }
-
-  resumeSimulationAudio(){
-    // Resume simulation audio
-    // As now pausing is more like "muting" the simulation audio bus
-    if(this.audioEngine.isInitialised() && this.current.audioBus)
-    {
-      this.current.audioBus.gain.setValueAtTime(
-        1,
-        this.audioEngine.audioContext.currentTime
-      );
-    }
   }
 
   resetGlobalParams() {

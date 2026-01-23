@@ -23,7 +23,6 @@ export class VSSimBase {
     this.audioEngine = audioEngine;
 
     this.audioBus = null;
-    this.audioBusGainPaused = 1;
 
     this.debugOverlay = new VSDebugOverlay(container); // Debug draw
     this.gui = new VSGUI({ 
@@ -77,10 +76,10 @@ export class VSSimBase {
     this.onAudioStart();
   }
 
-  /** Called when audio enigne is shut down or when exiting a simulation */
-  onAudioEngineShutdown() {
+  /** Called when audio engine is shut down or when exiting a simulation */
+  async onAudioEngineShutdown() {
     if (this.audioBus) {
-      this.audioBus.disconnect();
+      await this.audioEngine.releaseSimBus(this.audioBus);
       this.audioBus = null;
     }
     this.onAudioStop();

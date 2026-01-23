@@ -2,6 +2,7 @@
 export class VSAudioEngine {
   #enabled = null;
   #onInitCallback = null;
+  #audioFadeTimeSeconds = 0.02;
 
   constructor({ enabled = true, onInit = null } = {}) {
     this.#enabled = enabled;
@@ -9,6 +10,7 @@ export class VSAudioEngine {
 
     this.audioContext = null;
     this.masterGain = null;
+    this.simBus = null; // the bus of the running simulation
 
      // defer init to first user gesture
      this.#setupInitListener();
@@ -46,6 +48,15 @@ export class VSAudioEngine {
     }
   }
 
+  /*
+    Helper function to set a gain value over time
+  */
+  #setGainValue(gain, value) {
+    const t = this.audioContext.currentTime;
+    gain.cancelScheduledValues(t);
+    gain.setTargetAtTime(value, t, this.#audioFadeTimeSeconds);
+  }
+
   isInitialised() {
     return this.audioContext !== null;
   }
@@ -54,16 +65,35 @@ export class VSAudioEngine {
     return this.#enabled;
   }
 
-  setEnabled(enabled) {
+  setAudioEnabled(enabled) {
     this.#enabled = enabled;
 
     if (this.masterGain) {
-      this.masterGain.gain.value = this.#enabled ? 1.0 : 0.0;
+      let value = this.#enabled ? 1.0 : 0.0;
+      this.#setGainValue(this.masterGain.gain, value);
+    }
+  }
+
+  pauseSimulationAudio(){
+    // Pause simulation audio
+    // As now pausing is more like "muting" the simulation audio bus
+    if(this.isInitialised() && this.simBus)
+    {
+      this.#setGainValue(this.simBus.gain, 0);
+    }
+  }
+
+  resumeSimulationAudio(){
+    // Resume simulation audio
+    // As now pausing is more like "muting" the simulation audio bus
+    if(this.isInitialised() && this.simBus)
+    {
+      this.#setGainValue(this.simBus.gain, 1);
     }
   }
 
   /*
-    Create simulation bus - owned by the simulation.
+    Create simulation bus.
     In so doing the simulation owns all the audio graph it's triggering the sound in
     Resources will be released with the simulation
   */
@@ -73,11 +103,34 @@ export class VSAudioEngine {
       return null;
     }
 
-    const sceneGain = this.audioContext.createGain();
-    sceneGain.gain.value = 1.0;
-    sceneGain.connect(this.masterGain);
+    const bus = this.audioContext.createGain();
+    bus.gain.value = 0;
+    this.#setGainValue(bus.gain, 1);
+    bus.connect(this.masterGain);
 
-    return sceneGain;
+    this.simBus = bus;
+
+    return bus;
+  }
+
+  releaseSimBus(bus) {
+    if (!this.audioContext || !bus) {
+      return Promise.resolve();
+    }
+
+    this.#setGainValue(bus.gain, 0);
+  
+    // Resolve AFTER fade completes
+    return new Promise(resolve => {
+      setTimeout(() => {
+        try {
+          bus.disconnect();
+        } catch (e) {
+          // already disconnected — safe to ignore
+        }
+        resolve();
+      }, (this.#audioFadeTimeSeconds + 0.1) * 1000);
+    });
   }
 
   /*
