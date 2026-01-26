@@ -12,8 +12,8 @@ export class VSSettingsOverlay {
     Object.assign(this.mainDiv.style, {
       ...VSStyle.panelBase,
       position: "absolute",
-      top: VSStyle.sizing.edgeMedium,
-      right: VSStyle.sizing.edgeMedium,
+      bottom: VSStyle.sizing.edgeLarge,
+      right: VSStyle.sizing.edgeLarge,
       display: "flex",
       flexDirection: "column",
       gap: VSStyle.sizing.spacingMedium,
@@ -58,7 +58,8 @@ export class VSSettingsOverlay {
       container : this.guiContainer,
       style: {
         ...VSStyle.buttonBase,
-        width: "100%"
+        minWidth: "100%",
+        maxWidth: "100%"
       }
     });
   }

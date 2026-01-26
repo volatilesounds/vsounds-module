@@ -30,7 +30,8 @@ export class VSSimBase {
       close: true,
       style: {
         ...VSStyle.panelBase,
-        width: "100%"
+        minWidth: "100%",
+        maxWidth: "100%"
       }
     }); // GUI
 
