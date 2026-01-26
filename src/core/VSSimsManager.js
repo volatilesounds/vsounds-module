@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { VSDebugOverlay } from "../ui/VSDebugOverlay";
 import { VSSettingsOverlay } from "../ui/VSSettingsOverlay";
 import { VSAudioEngine } from '../audio/VSAudioEngine';
 import { VSMessageOverlay } from '../ui/VSMessageOverlay';
@@ -28,6 +29,8 @@ export class VSSimsManager {
     this.audioEnabled = this.audioEngine?.isEnabled() ?? true;
 
     // Overlay
+    this.debugOverlay = new VSDebugOverlay(container);
+
     this.settingsOverlay = new VSSettingsOverlay(container, {
       onToggleAudio: () => this.toggleAudio(),
       onTogglePlay: () => this.togglePause(),
@@ -140,7 +143,8 @@ export class VSSimsManager {
       scene: this.scene,
       camera: this.camera,
       renderer: this.renderer,
-      container: this.container,
+      container: this.settingsOverlay.mainDiv,
+      debugOverlay: this.debugOverlay,
       audioEngine: this.audioEngine
     });
 

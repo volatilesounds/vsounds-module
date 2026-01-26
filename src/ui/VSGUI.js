@@ -23,7 +23,7 @@ import { VSStyle } from "./VSStyle";
  * In short: lil-gui talks to proxies, simulations own the truth.
  */
 export class VSGUI {
-  constructor({ container, title = null, style = {} } = {}) {
+  constructor({ container, title = null, style = {}, close = false } = {}) {
     this.gui = new GUI({
       title: title,
       autoPlace: false, // so that we can decide where to place it
@@ -33,13 +33,19 @@ export class VSGUI {
     Object.assign(this.gui.domElement.style, VSStyle.panelBase, style);
 
     // Hide the GUI title if null
+    const titleEl = this.gui.domElement.querySelector(".lil-title");
     if(title === null)
     {
-      const titleEl = this.gui.domElement.querySelector(".lil-title");
       if (titleEl)
       {
         titleEl.style.display = "none";
       }
+    }
+    
+    // collapse
+    if(close)
+    {
+      this.gui.close();
     }
 
     container.appendChild(this.gui.domElement);

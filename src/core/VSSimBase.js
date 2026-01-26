@@ -1,4 +1,3 @@
-import { VSDebugOverlay } from "../ui/VSDebugOverlay";
 import { VSGUI } from "../ui/VSGUI";
 import { VSStyle } from "../ui/VSStyle";
 
@@ -7,7 +6,7 @@ import { VSStyle } from "../ui/VSStyle";
  It provides a common interface among different scenes so that they can be easily managed by VSSimsManager.
 */
 export class VSSimBase {
-  constructor({ scene, camera, renderer, container, audioEngine, title = "Simulation", description = "This is a simulation." }) {
+  constructor({ scene, camera, renderer, container, audioEngine, debugOverlay, title = "Simulation", description = "This is a simulation." }) {
     // Enforcing final functions
     if (this.onAudioEngineInit !== VSSimBase.prototype.onAudioEngineInit) {
       throw new Error("onAudioEngineInit must not be overridden - override onAudioStart");
@@ -24,15 +23,14 @@ export class VSSimBase {
 
     this.audioBus = null;
 
-    this.debugOverlay = new VSDebugOverlay(container); // Debug draw
+    this.debugOverlay = debugOverlay; // Debug draw
     this.gui = new VSGUI({ 
       container, 
       title: title,
+      close: true,
       style: {
         ...VSStyle.panelBase,
-        position: 'absolute',
-        bottom: VSStyle.sizing.edgeMedium,
-        right: VSStyle.sizing.edgeMedium,
+        width: "100%"
       }
     }); // GUI
 
