@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { VSDebugOverlay } from "../ui/VSDebugOverlay";
 import { VSSettingsOverlay } from "../ui/VSSettingsOverlay";
 import { VSAudioEngine } from '../audio/VSAudioEngine';
@@ -23,6 +24,11 @@ export class VSSimsManager {
 
     this.currentSim = null;
     this.currentSimClass = null;
+
+    // Create orbit controls
+    this.orbitControls = new OrbitControls(camera, renderer.domElement)
+    this.orbitControls.enableDamping = true
+    this.orbitControls.enabled = false
 
     // State
     this.paused = false;
@@ -50,7 +56,15 @@ export class VSSimsManager {
 
     // Add here params to be shown in settings overlay controls view
     this.simSpeed = 1.;
+    this.enabledOrbitControls = false;
+
     this.settingsOverlay.gui.addParams({
+      orbit: {
+        type: "boolean",
+        value: this.enabledOrbitControls,
+        label: "Orbit Controls",
+        onChange: v => {this.orbitControls.enabled = v}
+      },
       speed: {
         value: this.simSpeed,
         min: 0,
@@ -161,6 +175,10 @@ export class VSSimsManager {
 
     // reset global param
     this.resetGlobalParams();
+
+    // reset orbit controls and save camera states
+    // we could save the state of controls that get reset with saveState
+    this.orbitControls.reset();
   }
 
   resetGlobalParams() {

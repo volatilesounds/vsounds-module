@@ -65,20 +65,45 @@ export class VSGUI {
   }
 
   #addParam(key, config) {
-    const { value, min, max, step, label, onChange } = config;
+    const {
+      type = typeof config.value,
+      value,
+      min,
+      max,
+      step,
+      label,
+      onChange
+    } = config;
   
     const proxy = { value };
-    const controller = this.gui
-      .add(proxy, "value", min, max, step)
-      .name(label ?? key);
+    let controller;
+  
+    switch (type) {
+      case "boolean":
+        controller = this.gui
+          .add(proxy, "value")
+          .name(label ?? key);
+        break;
+  
+      case "number":
+        controller = this.gui
+          .add(proxy, "value", min, max, step)
+          .name(label ?? key);
+        break;
+  
+      default:
+        console.warn(`[VSGUI] Unsupported param type: ${type}`, key);
+        return;
+    }
   
     controller.onChange(v => {
+      //config.value = v;   // config is default value so we don't update it
       onChange?.(v);
     });
   
-    // store both proxy and controller
     this._proxies[key] = { proxy, controller, config };
   }
+  
   
   // reset all
   reset() {
