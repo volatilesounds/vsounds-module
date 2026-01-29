@@ -12,8 +12,8 @@ export const VSStyle = {
     
     // For offsets from edges of a container / screen
     edgeSmall: '4px',
-    edgeMedium: '10px',
-    edgeLarge: '20px'
+    edgeMedium: '12px',
+    edgeLarge: '22px'
   },
 
   colors: {

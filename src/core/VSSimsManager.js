@@ -21,7 +21,7 @@ export class VSSimsManager {
     this.scene = new THREE.Scene();
     this.clock = new THREE.Clock();
 
-    this.current = null;
+    this.currentSim = null;
     this.currentSimClass = null;
 
     // State
@@ -85,8 +85,8 @@ export class VSSimsManager {
   }
 
   onAudioEngineInit() {
-    if (this.current) {
-      this.current.onAudioEngineInit?.();
+    if (this.currentSim) {
+      this.currentSim.onAudioEngineInit?.();
 
       // As audio engine init might be called after the simulation has been paused
       if(this.paused)
@@ -97,7 +97,7 @@ export class VSSimsManager {
   }
 
   restartSimulation() {
-    if (!this.current || !this.currentSimClass) {
+    if (!this.currentSim || !this.currentSimClass) {
       return;
     }
 
@@ -105,7 +105,7 @@ export class VSSimsManager {
   }
 
   pauseSimulation() {
-    if (!this.current) {
+    if (!this.currentSim) {
       return;
     }
 
@@ -113,11 +113,11 @@ export class VSSimsManager {
 
     this.audioEngine.pauseSimulationAudio();
 
-    this.current.onPause?.();
+    this.currentSim.onPause?.();
   }
 
   resumeSimulation() {
-    if (!this.current) {
+    if (!this.currentSim) {
       return;
     }
 
@@ -126,32 +126,32 @@ export class VSSimsManager {
 
     this.audioEngine.resumeSimulationAudio();
 
-    this.current.onResume?.();
+    this.currentSim.onResume?.();
   }
 
   async setSimulation(SimClass) {
-    if (this.current) {
-      await this.current.onAudioEngineShutdown();
-      this.current.onExit();
-      this.current.dispose?.();
+    if (this.currentSim) {
+      await this.currentSim.onAudioEngineShutdown();
+      this.currentSim.onExit();
+      this.currentSim.dispose?.();
       this._clearSim();
     }
 
     this.currentSimClass = SimClass;
 
-    this.current = new SimClass({
+    this.currentSim = new SimClass({
       scene: this.scene,
       camera: this.camera,
       renderer: this.renderer,
-      container: this.settingsOverlay.mainDiv,
+      container: this.settingsOverlay.guiContainer,
       debugOverlay: this.debugOverlay,
       audioEngine: this.audioEngine
     });
 
-    this.current.onEnter();
+    this.currentSim.onEnter();
     if(this.audioEngine.isInitialised())
     {
-      this.current.onAudioEngineInit?.();
+      this.currentSim.onAudioEngineInit?.();
     }
     
     if(this.paused)
@@ -168,7 +168,7 @@ export class VSSimsManager {
   }
 
   update() {
-    if (!this.current)
+    if (!this.currentSim)
     {
       return;
     }
@@ -179,7 +179,7 @@ export class VSSimsManager {
     dt *= this.simSpeed;
 
     if (!this.paused) {
-      this.current.update(dt);
+      this.currentSim.update(dt);
     }
 
     this.renderer.render(this.scene, this.camera);

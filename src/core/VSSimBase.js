@@ -27,16 +27,17 @@ export class VSSimBase {
     this.gui = new VSGUI({ 
       container, 
       title: title,
-      close: true,
+      close: false,
       style: {
         ...VSStyle.panelBase,
+        marginTop: VSStyle.sizing.spacingMedium,
         minWidth: "100%",
         maxWidth: "100%"
       }
     }); // GUI
 
     // We don't show the GUI by default
-    this.showParams(false);
+    this.showParams(true);
   }
 
   /** Called once when sim becomes active */
@@ -93,10 +94,7 @@ export class VSSimBase {
   update(dt) {}
 
   /** Optional cleanup */
-  dispose() {
-    this.debugOverlay?.dispose();
-    this.debugOverlay = null;
-    
+  dispose() {    
     this.gui?.destroy();
     this.gui = null;
   }

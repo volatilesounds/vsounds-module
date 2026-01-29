@@ -2,10 +2,11 @@ import { VSStyle } from "./VSStyle";
 import { VSGUI } from '../ui/VSGUI';
 
 export class VSSettingsOverlay {
-  constructor(container, { onToggleAudio, onTogglePlay, onRestart } = {}) {
+  constructor(container, { onToggleAudio, onTogglePlay, onRestart, onShowControls } = {}) {
     this.onToggleAudio = onToggleAudio;
     this.onTogglePlay = onTogglePlay;
     this.onRestart = onRestart;
+    this.onShowControls = onShowControls;
 
     // Main container
     this.mainDiv = document.createElement("div");
@@ -42,7 +43,7 @@ export class VSSettingsOverlay {
     this.audioBtn.onclick = () => this.onToggleAudio?.();
     this.playBtn.onclick = () => this.onTogglePlay?.();
     this.restartBtn.onclick = () => this.#restart();
-    this.controlsBtn.onclick = () => this.#showControls();
+    this.controlsBtn.onclick = () => this.#toggleControls();
 
     buttonsDiv.append(this.controlsBtn, this.audioBtn, this.playBtn, this.restartBtn);
 
@@ -86,8 +87,9 @@ export class VSSettingsOverlay {
     if (confirmed) this.onRestart?.();
   }
 
-  #showControls() {
-    const isHidden = this.guiContainer.style.display === "none";
-    this.guiContainer.style.display = isHidden ? "block" : "none";
+  #toggleControls() {
+    const show = this.guiContainer.style.display === "none";
+    this.guiContainer.style.display = show ? "block" : "none";
+    this.onShowControls?.(show);
   }
 }
